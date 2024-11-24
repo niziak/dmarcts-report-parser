@@ -308,25 +308,14 @@ if ($reports_source == TS_IMAP) {
 	  Ssl        => $imapssl,
 	  Starttls   => $imapopt,
 	  Debug      => $debug,
-	  Socketargs => $socketargs
+	  Socketargs => $socketargs,
+	  User       => $imapuser,
+	  Password   => $imappass,
+	  Uid        => 1,
+	  Ignoresizeerrors => $imapignoreerror
 	)
 	# module uses eval, so we use $@ instead of $!
-	or die "$scriptname: IMAP Failure: $@";
-
-	# This connection is finished this way because of the tradgedy of exchange...
-	$imap->User($imapuser);
-	$imap->Password($imappass);
-	$imap->connect() or die "$scriptname: Could not connect: $@";
-
-	# Ignore Size Errors if we're using Exchange
-	$imap->Ignoresizeerrors($imapignoreerror);
-
-	# Set $imap to UID mode, which will force imap functions to use/return
-	# UIDs, instead of message sequence numbers. UIDs are not allowed to
-	# change during a session and are not allowed to be used twice. Looping
-	# over message sequence numbers and deleting a msg in between could have
-	# unwanted side effects.
-	$imap->Uid(1);
+	or die "$scriptname: Could not connect: $@";
 
 	# How many msgs are we going to process?
 	print "Processing ". $imap->message_count($imapreadfolder)." messages in folder <$imapreadfolder>.\n" if $debug;
